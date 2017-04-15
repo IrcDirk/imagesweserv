@@ -112,10 +112,6 @@ class ApiTest extends TestCase
                     'hasAlpha' => true,
                     'is16Bit' => false,
                     'isPremultiplied' => false,
-                    'rotation' => 0,
-                    'flip' => false,
-                    'flop' => false,
-                    'cropCoordinates' => null,
                     'w' => 0,
                     'h' => 0,
                 ]);

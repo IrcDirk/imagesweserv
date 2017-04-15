@@ -33,23 +33,13 @@ class CropTest extends TestCase
         $this->assertInstanceOf('AndriesLouw\imagesweserv\Manipulators\Crop', $this->manipulator);
     }
 
-    public function testRun()
-    {
-        $this->image->shouldReceive('crop')->with(0, 0, 100, 100)->andReturnSelf()->once();
-
-        $this->assertInstanceOf(
-            'Jcupitt\Vips\Image',
-            $this->manipulator->setParams(['cropCoordinates' => [100, 100, 0, 0]])->run($this->image)
-        );
-    }
-
     public function testCrop()
     {
         $this->image->shouldReceive('crop')->with(0, 0, 100, 100)->andReturnSelf()->once();
 
         $this->assertInstanceOf(
             'Jcupitt\Vips\Image',
-            $this->manipulator->setParams(['cropCoordinates' => [100, 100, 0, 0]])->run($this->image)
+            $this->manipulator->setParams(['crop' => '100,100,0,0'])->run($this->image)
         );
     }
 
@@ -88,74 +78,33 @@ class CropTest extends TestCase
         );
     }
 
-    public function testEntropyCrop()
+    public function testResolveCropCoordinates()
     {
-        $image = Mockery::mock('Jcupitt\Vips\Image[__get]', [''], function ($mock) {
-            $mock->shouldReceive('__get')
-                ->with('width')
-                ->andReturn(327)
-                ->times(1);
-
-            $mock->shouldReceive('__get')
-                ->with('height')
-                ->andReturn(369)
-                ->times(1);
-
-            $mock->shouldReceive('smartcrop')
-                ->with(300, 300, ['interesting' => 'entropy'])
-                ->andReturnSelf()
-                ->once();
-        });
-
-        $params = [
-            'w' => 300,
-            'h' => 300,
-            't' => 'square',
-            'a' => 'entropy',
-            'hasAlpha' => false,
-            'is16Bit' => false,
-            'isPremultiplied' => false,
-        ];
-
-        $this->assertInstanceOf(
-            'Jcupitt\Vips\Image',
-            $this->manipulator->setParams($params)->run($image)
+        $this->assertSame(
+            [100, 100, 0, 0],
+            $this->manipulator->setParams(['crop' => '100,100,0,0'])->resolveCropCoordinates(100, 100)
         );
-    }
-
-    public function testAttentionCrop()
-    {
-        $image = Mockery::mock('Jcupitt\Vips\Image[__get]', [''], function ($mock) {
-            $mock->shouldReceive('__get')
-                ->with('width')
-                ->andReturn(327)
-                ->times(1);
-
-            $mock->shouldReceive('__get')
-                ->with('height')
-                ->andReturn(369)
-                ->times(1);
-
-            $mock->shouldReceive('smartcrop')
-                ->with(300, 300, ['interesting' => 'attention'])
-                ->andReturnSelf()
-                ->once();
-        });
-
-        $params = [
-            'w' => 300,
-            'h' => 300,
-            't' => 'square',
-            'a' => 'attention',
-            'hasAlpha' => false,
-            'is16Bit' => false,
-            'isPremultiplied' => false,
-        ];
-
-        $this->assertInstanceOf(
-            'Jcupitt\Vips\Image',
-            $this->manipulator->setParams($params)->run($image)
+        $this->assertSame(
+            [101, 1, 1, 1],
+            $this->manipulator->setParams(['crop' => '101,1,1,1'])->resolveCropCoordinates(100, 100)
         );
+        $this->assertSame(
+            [1, 101, 1, 1],
+            $this->manipulator->setParams(['crop' => '1,101,1,1'])->resolveCropCoordinates(100, 100)
+        );
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => null])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => '1,1,1,'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => '1,1,,1'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => '1,,1,1'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => ',1,1,1'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null,
+            $this->manipulator->setParams(['crop' => '-1,1,1,1'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null,
+            $this->manipulator->setParams(['crop' => '1,1,101,1'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null,
+            $this->manipulator->setParams(['crop' => '1,1,1,101'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => 'a'])->resolveCropCoordinates(100, 100));
+        $this->assertSame(null, $this->manipulator->setParams(['crop' => ''])->resolveCropCoordinates(100, 100));
     }
 
     public function testValidateCoordinates()

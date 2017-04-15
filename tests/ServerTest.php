@@ -136,10 +136,6 @@ class ServerTest extends TestCase
                     'hasAlpha' => true,
                     'is16Bit' => false,
                     'isPremultiplied' => false,
-                    'rotation' => 0,
-                    'flip' => false,
-                    'flop' => false,
-                    'cropCoordinates' => null,
                     'w' => 0,
                     'h' => 0,
                 ]);
@@ -205,10 +201,6 @@ class ServerTest extends TestCase
                     'is16Bit' => false,
                     'isPremultiplied' => false,
                     'encoding' => 'base64',
-                    'rotation' => 0,
-                    'flip' => false,
-                    'flop' => false,
-                    'cropCoordinates' => null,
                     'w' => 0,
                     'h' => 0,
                 ]);

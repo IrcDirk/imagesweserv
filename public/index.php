@@ -227,8 +227,8 @@ if (!empty($_GET['url'])) {
 
     // Set manipulators
     $manipulators = [
-        new AndriesLouw\imagesweserv\Manipulators\Trim(),
         new AndriesLouw\imagesweserv\Manipulators\Size(71000000),
+        new AndriesLouw\imagesweserv\Manipulators\Trim(),
         new AndriesLouw\imagesweserv\Manipulators\Orientation(),
         new AndriesLouw\imagesweserv\Manipulators\Crop(),
         new AndriesLouw\imagesweserv\Manipulators\Letterbox(),

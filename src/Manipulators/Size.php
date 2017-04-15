@@ -3,21 +3,17 @@
 namespace AndriesLouw\imagesweserv\Manipulators;
 
 use AndriesLouw\imagesweserv\Exception\ImageTooLargeException;
+use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
 use Jcupitt\Vips\Image;
-use Jcupitt\Vips\Kernel;
 
 /**
  * @property string $t
  * @property string $h
  * @property string $w
- * @property bool $hasAlpha
- * @property bool $isPremultiplied
- * @property int $rotation
+ * @property string $a
  * @property string $tmpFileName
- * @property string $loader
- * @property string $trim
- * @property array|null $cropCoordinates
  * @property string $page
+ * @property string $or
  */
 class Size extends BaseManipulator
 {
@@ -81,7 +77,7 @@ class Size extends BaseManipulator
 
     /**
      * Indicating if we should not enlarge the output if the input width
-     * *or* height are already less than the required dimensions
+     * *and* height are already less than the required dimensions
      *
      * @param  string $fit The resolved fit.
      *
@@ -96,7 +92,6 @@ class Size extends BaseManipulator
 
         return false;
     }
-
 
     /**
      * Resolve fit.
@@ -160,20 +155,37 @@ class Size extends BaseManipulator
      */
     public function doResize(Image $image, string $fit, int $width, int $height): Image
     {
+        // Default settings
+        $thumbnailOptions = [
+            'auto_rotate' => true,
+            'linear' => false,
+        ];
+
         $inputWidth = $image->width;
         $inputHeight = $image->height;
-        $rotation = $this->rotation;
-        if ($rotation === 90 || $rotation === 270) {
+
+        $orientation = $this->or;
+        $exifOrientation = Utils::resolveExifOrientation($image);
+        $userRotate = $orientation === '90' || $orientation === '270';
+        $autoRotate = $exifOrientation === 90 || $exifOrientation === 270;
+
+        if ($userRotate || $autoRotate) {
             // Swap input output width and height when rotating by 90 or 270 degrees
+            // Or when the image has exif orientation
             list($inputWidth, $inputHeight) = [$inputHeight, $inputWidth];
         }
 
+        $cropPosition = $this->a;
+
         // Scaling calculations
-        $xFactor = 1.0;
-        $yFactor = 1.0;
         $targetResizeWidth = $width;
         $targetResizeHeight = $height;
-        if ($width > 0 && $height > 0) {
+
+        // Is smart crop?
+        if ($cropPosition === 'entropy' || $cropPosition === 'attention') {
+            // Set crop option
+            $thumbnailOptions['crop'] = $cropPosition;
+        } elseif ($width > 0 && $height > 0) {
             // Fixed width and height
             $xFactor = (float)($inputWidth / $width);
             $yFactor = (float)($inputHeight / $height);
@@ -183,10 +195,8 @@ class Size extends BaseManipulator
                 case 'crop':
                     if ($xFactor < $yFactor) {
                         $targetResizeHeight = (int)round((float)($inputHeight / $xFactor));
-                        $yFactor = $xFactor;
                     } else {
                         $targetResizeWidth = (int)round((float)($inputWidth / $yFactor));
-                        $xFactor = $yFactor;
                     }
                     break;
                 case 'letterbox':
@@ -194,201 +204,49 @@ class Size extends BaseManipulator
                 case 'fitup':
                     if ($xFactor > $yFactor) {
                         $targetResizeHeight = (int)round((float)($inputHeight / $xFactor));
-                        $yFactor = $xFactor;
                     } else {
                         $targetResizeWidth = (int)round((float)($inputWidth / $yFactor));
-                        $xFactor = $yFactor;
                     }
                     break;
-                case 'absolute':
-                    if ($rotation === 90 || $rotation === 270) {
-                        list($xFactor, $yFactor) = [$yFactor, $xFactor];
-                    }
-                    break;
+            }
+        } elseif ($width > 0) {
+            // Fixed width
+            $xFactor = (float)($inputWidth / $width);
+            if ($fit === 'absolute') {
+                $targetResizeHeight = $inputHeight;
+            } else {
+                // Auto height
+                $yFactor = $xFactor;
+                $targetResizeHeight = (int)round((float)($inputHeight / $yFactor));
+            }
+        } elseif ($height > 0) {
+            // Fixed height
+            $yFactor = (float)($inputHeight / $height);
+            if ($fit === 'absolute') {
+                $targetResizeWidth = $inputWidth;
+            } else {
+                // Auto width
+                $xFactor = $yFactor;
+                $targetResizeWidth = (int)round((float)($inputWidth / $xFactor));
             }
         } else {
-            if ($width > 0) {
-                // Fixed width
-                $xFactor = (float)($inputWidth / $width);
-                if ($fit === 'absolute') {
-                    $targetResizeHeight = $height = $inputHeight;
-                } else {
-                    // Auto height
-                    $yFactor = $xFactor;
-                    $targetResizeHeight = $height = (int)round((float)($inputHeight / $yFactor));
-                }
-            } else {
-                if ($height > 0) {
-                    // Fixed height
-                    $yFactor = (float)($inputHeight / $height);
-                    if ($fit === 'absolute') {
-                        $targetResizeWidth = $width = $inputWidth;
-                    } else {
-                        // Auto width
-                        $xFactor = $yFactor;
-                        $targetResizeWidth = $width = (int)round((float)($inputWidth / $xFactor));
-                    }
-                } else {
-                    // Identity transform
-                    $width = $inputWidth;
-                    $height = $inputHeight;
-                }
-            }
+            // No resize required; return original image
+            return $image;
         }
 
-        // Calculate integral box shrink
-        $xShrink = max(1, (int)floor($xFactor));
-        $yShrink = max(1, (int)floor($yFactor));
-
-        // Calculate residual float affine transformation
-        $xResidual = (float)($xShrink / $xFactor);
-        $yResidual = (float)($yShrink / $yFactor);
-
-        // Do not enlarge the output if the input width *and* height
-        // are already less than the required dimensions
-        if ($this->withoutEnlargement($fit)) {
-            if ($inputWidth < $width && $inputHeight < $height) {
-                $xFactor = 1.0;
-                $yFactor = 1.0;
-                $xShrink = 1;
-                $yShrink = 1;
-                $xResidual = 1.0;
-                $yResidual = 1.0;
-                $width = $inputWidth;
-                $height = $inputHeight;
-            }
+        if ($userRotate) {
+            // Swap target output width and height when rotating by 90 or 270 degrees
+            // Note: don't check here for EXIF orientation because that's handled
+            // in the thumbnail operator.
+            list($targetResizeWidth, $targetResizeHeight) = [$targetResizeHeight, $targetResizeWidth];
         }
 
-        // Get the current vips loader
-        $loader = $this->loader;
+        // Assign settings
+        $thumbnailOptions['height'] = $targetResizeHeight;
+        $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? 'down' : 'both';
 
-        // If integral x and y shrink are equal, try to use shrink-on-load for JPEG, WebP, PDF and SVG
-        // but not when trimming or pre-resize crop
-        $shrinkOnLoad = 1;
-        if ($xShrink === $yShrink && $xShrink >= 2 &&
-            ($loader === 'VipsForeignLoadJpegFile' ||
-                $loader === 'VipsForeignLoadWebpFile' ||
-                $loader === 'VipsForeignLoadPdfFile' ||
-                $loader === 'VipsForeignLoadSvgFile') &&
-            !$this->trim && !$this->cropCoordinates
-        ) {
-            if ($xShrink >= 8) {
-                $xFactor /= 8;
-                $yFactor /= 8;
-                $shrinkOnLoad = 8;
-            } elseif ($xShrink >= 4) {
-                $xFactor /= 4;
-                $yFactor /= 4;
-                $shrinkOnLoad = 4;
-            } elseif ($xShrink >= 2) {
-                $xFactor /= 2;
-                $yFactor /= 2;
-                $shrinkOnLoad = 2;
-            }
-        }
-
-        if ($shrinkOnLoad > 1) {
-            // Reload input using shrink-on-load
-            if ($loader === 'VipsForeignLoadJpegFile') {
-                // Reload JPEG file
-                $image = Image::jpegload($this->tmpFileName, ['shrink' => $shrinkOnLoad]);
-            } elseif ($loader === 'VipsForeignLoadWebpFile') {
-                // Reload WebP file
-                $image = Image::webpload($this->tmpFileName, ['shrink' => $shrinkOnLoad]);
-            } elseif ($loader === 'VipsForeignLoadPdfFile') {
-                // Reload PDF file
-                // (don't forget to pass on the page that we want)
-                $image = Image::pdfload($this->tmpFileName, [
-                    'scale' => 1.0 / $shrinkOnLoad,
-                    'page' => $this->page && is_numeric($this->page) && $this->page >= 0 && $this->page <= 100000 ? (int)$this->page : 0
-                ]);
-            } else {
-                // Reload SVG file
-                $image = Image::svgload($this->tmpFileName, ['scale' => 1.0 / $shrinkOnLoad]);
-            }
-            // Recalculate integral shrink and float residual
-            $shrunkOnLoadWidth = $image->width;
-            $shrunkOnLoadHeight = $image->height;
-            if ($rotation === 90 || $rotation === 270) {
-                // Swap input output width and height when rotating by 90 or 270 degrees
-                list($shrunkOnLoadWidth, $shrunkOnLoadHeight) = [$shrunkOnLoadHeight, $shrunkOnLoadWidth];
-            }
-            $xFactor = (float)($shrunkOnLoadWidth) / (float)($targetResizeWidth);
-            $yFactor = (float)($shrunkOnLoadHeight) / (float)($targetResizeHeight);
-            $xShrink = max(1, (int)floor($xFactor));
-            $yShrink = max(1, (int)floor($yFactor));
-            $xResidual = (float)($xShrink) / $xFactor;
-            $yResidual = (float)($yShrink) / $yFactor;
-            if ($rotation === 90 || $rotation === 270) {
-                list($xResidual, $yResidual) = [$yResidual, $xResidual];
-            }
-        }
-
-        $shouldReduce = $xResidual !== 1.0 || $yResidual !== 1.0;
-        $shouldShrink = $xShrink > 1 || $yShrink > 1;
-        $shouldPremultiplyAlpha = $this->hasAlpha && !$this->isPremultiplied && ($shouldReduce || $shouldShrink);
-
-        if ($shouldPremultiplyAlpha) {
-            // Premultiply image alpha channel before shrink/reduce transformations to avoid
-            // dark fringing around bright pixels
-            // See: http://entropymine.com/imageworsener/resizealpha/
-            $image = $image->premultiply();
-            $this->isPremultiplied = true;
-        }
-
-        // Fast, integral box-shrink
-        if ($shouldShrink) {
-            if ($yShrink > 1) {
-                $image = $image->shrinkv($yShrink);
-            }
-            if ($xShrink > 1) {
-                $image = $image->shrinkh($xShrink);
-            }
-            // Recalculate residual float based on dimensions of required vs shrunk images
-            $shrunkWidth = $image->width;
-            $shrunkHeight = $image->height;
-            if ($rotation === 90 || $rotation === 270) {
-                // Swap input output width and height when rotating by 90 or 270 degrees
-                list($shrunkWidth, $shrunkHeight) = [$shrunkHeight, $shrunkWidth];
-            }
-            $xResidual = (float)($targetResizeWidth / $shrunkWidth);
-            $yResidual = (float)($targetResizeHeight / $shrunkHeight);
-            if ($rotation === 90 || $rotation === 270) {
-                list($xResidual, $yResidual) = [$yResidual, $xResidual];
-            }
-        }
-
-        // Use affine increase or kernel reduce with the remaining float part
-        if ($xResidual !== 1.0 || $yResidual !== 1.0) {
-            // Perform kernel-based reduction
-            if ($yResidual < 1.0 || $xResidual < 1.0) {
-                // Use *magick centre sampling convention instead of corner sampling
-                $centreSampling = true;
-
-                if ($yResidual < 1.0) {
-                    $image = $image->reducev(1.0 / $yResidual, [
-                        'kernel' => Kernel::LANCZOS3,
-                        'centre' => $centreSampling
-                    ]);
-                }
-                if ($xResidual < 1.0) {
-                    $image = $image->reduceh(1.0 / $xResidual, [
-                        'kernel' => Kernel::LANCZOS3,
-                        'centre' => $centreSampling
-                    ]);
-                }
-            }
-            // Perform affine enlargement
-            if ($yResidual > 1.0 || $xResidual > 1.0) {
-                if ($yResidual > 1.0) {
-                    $image = $image->affine([1.0, 0.0, 0.0, $yResidual]/*, ['interpolate' => 'bicubic']*/);
-                }
-                if ($xResidual > 1.0) {
-                    $image = $image->affine([$xResidual, 0.0, 0.0, 1.0]/*, ['interpolate' => 'bicubic']*/);
-                }
-            }
-        }
-
-        return $image;
+        // TODO Pass $this->page to thumbnail a single page?
+        // TODO Ignore aspect ratio
+        return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
     }
 }

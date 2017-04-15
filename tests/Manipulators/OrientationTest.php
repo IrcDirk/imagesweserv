@@ -34,18 +34,14 @@ class OrientationTest extends TestCase
         $this->assertInstanceOf(
             'Jcupitt\Vips\Image',
             $this->manipulator->setParams([
-                'rotation' => 0,
-                'flip' => false,
-                'flop' => false
+                'or' => '0'
             ])->run($image)
         );
 
         $this->assertInstanceOf(
             'Jcupitt\Vips\Image',
             $this->manipulator->setParams([
-                'rotation' => 90,
-                'flip' => false,
-                'flop' => false
+                'or' => '90'
             ])->run($image)
         );
     }
