@@ -227,8 +227,8 @@ if (!empty($_GET['url'])) {
 
     // Set manipulators
     $manipulators = [
-        new AndriesLouw\imagesweserv\Manipulators\Size(71000000),
         new AndriesLouw\imagesweserv\Manipulators\Trim(),
+        new AndriesLouw\imagesweserv\Manipulators\Size(71000000),
         new AndriesLouw\imagesweserv\Manipulators\Orientation(),
         new AndriesLouw\imagesweserv\Manipulators\Crop(),
         new AndriesLouw\imagesweserv\Manipulators\Letterbox(),
@@ -666,7 +666,7 @@ if (!empty($_GET['url'])) {
                     <pre><code class="language-html">&lt;img src="//$url/?url=$exampleImage&amp;crop=300,300,680,500"&gt;</code></pre>
                     <a href="//$url/?url=$exampleImage&amp;crop=300,300,680,500"><img src="//$url/?url=$exampleImage&amp;crop=300,300,680,500" alt=""/></a>
                     <h3 id="crop-smartcrop">Smart crop <code>&amp;a=entropy</code> or <code>&amp;a=attention</code> <span class="new">New!</span></h3>
-                    <p>Crops the image down to specific dimensions by removing boring parts. Only works when <code>t=square</code>.</p>
+                    <p>Crops the image down to specific dimensions by removing boring parts. Only works when <code>t=square</code>. More info: <a href="https://github.com/andrieslouw/imagesweserv/issues/90">Issue #90 - Add support for smart crop</a>.</p>
                     <h4 id="smartcrop-accepts">Accepts:</h4>
                     <ul>
                         <li><code>entropy</code>: focus on the region with the highest <a href="https://en.wikipedia.org/wiki/Entropy_%28information_theory%29">Shannon entropy</a>.</li>
@@ -723,7 +723,7 @@ if (!empty($_GET['url'])) {
                     <pre><code class="language-html">&lt;img src="//$url/?url=$exampleTransparentImage&amp;w=300&amp;trim=10"&gt;</code></pre>
                     <a class="trimedges" href="//$url/?url=$exampleTransparentImage&amp;w=300&amp;trim=10"><img src="//$url/?url=$exampleTransparentImage&amp;w=300&amp;trim=10" alt=""/></a>
                     <h3 id="background-bg">Background <code>&amp;bg=</code> <span class="new">New!</span></h3>
-                    <p>Sets the background color of the image. Supports a variety of color formats. In addition to the 140 color names supported by all modern browsers (listed <a href="//$url/colors.html">here</a>), it also accepts hexadecimal RGB and RBG alpha formats.</p>
+                    <p>Sets the background color of the image. Supports a variety of color formats. In addition to the 140 color names supported by all modern browsers (listed <a href="//$url/colors.html">here</a>), it also accepts hexadecimal RGB and RBG alpha formats. More info: <a href="https://github.com/andrieslouw/imagesweserv/issues/81">Issue #81 - Background setting</a>.</p>
                     <h4 id="hexadecimal">Hexadecimal</h4>
                     <ul>
                         <li>3 digit RGB: <code>CCC</code></li>
@@ -737,7 +737,7 @@ if (!empty($_GET['url'])) {
                 <section id="effects" class="goto">
                     <h1>Effects</h1>
                     <h3 id="blur-blur">Blur <code>&amp;blur=</code> <span class="new">New!</span></h3>
-                    <p>Adds a blur effect to the image. Use values between <code>0</code> and <code>100</code>.</p>
+                    <p>Adds a blur effect to the image. Use values between <code>0</code> and <code>100</code>.</p><p>More info: <a href="https://github.com/andrieslouw/imagesweserv/issues/69">Issue #69 - Allow blur transformation (with radius parameter)</a>.</p>
                     <pre><code class="language-html">&lt;img src="//$url/?url=$exampleImage&amp;w=300&amp;blur=5"&gt;</code></pre>
                     <a href="//$url/?url=$exampleImage&amp;w=300&amp;blur=5"><img src="//$url/?url=$exampleImage&amp;w=300&amp;blur=5" alt=""/></a>
                     <h3 id="filter-filt">Filter <code>&amp;filt=</code> <span class="new">New!</span></h3>

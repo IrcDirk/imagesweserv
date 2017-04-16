@@ -14,6 +14,7 @@ use Jcupitt\Vips\Image;
  * @property string $tmpFileName
  * @property string $page
  * @property string $or
+ * @property string $trim
  */
 class Size extends BaseManipulator
 {
@@ -245,8 +246,18 @@ class Size extends BaseManipulator
         $thumbnailOptions['height'] = $targetResizeHeight;
         $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? 'down' : 'both';
 
-        // TODO Pass $this->page to thumbnail a single page?
-        // TODO Ignore aspect ratio
-        return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
+        if ($this->trim) {
+            // Trimming occurs before any resize operation, but we can't thumbnail
+            // on an existing image due to shrink-on-load. To achieve this:
+            // write the image to a buffer and do the thumbnail operator on that buffer.
+            // (Feels a little hackish but there is not an alternative at this moment..)
+            // TODO Thumbnail on an existing image?
+            return $image->thumbnail_buffer($image->writeToBuffer('.png'), $targetResizeWidth, $thumbnailOptions);
+        } else {
+            // TODO Pass $this->page to thumbnail a single page?
+            // TODO Ignore aspect ratio?
+            // Mocking on static methods is not possible, so we don't use `Image::`.
+            return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
+        }
     }
 }
