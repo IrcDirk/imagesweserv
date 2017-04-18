@@ -229,8 +229,8 @@ if (!empty($_GET['url'])) {
     $manipulators = [
         new AndriesLouw\imagesweserv\Manipulators\Trim(),
         new AndriesLouw\imagesweserv\Manipulators\Size(71000000),
-        new AndriesLouw\imagesweserv\Manipulators\Orientation(),
         new AndriesLouw\imagesweserv\Manipulators\Crop(),
+        new AndriesLouw\imagesweserv\Manipulators\Orientation(),
         new AndriesLouw\imagesweserv\Manipulators\Letterbox(),
         new AndriesLouw\imagesweserv\Manipulators\Shape,
         new AndriesLouw\imagesweserv\Manipulators\Brightness(),
@@ -659,8 +659,8 @@ if (!empty($_GET['url'])) {
                     <a href="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=top"><img src="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=top" alt=""/></a>
                     <h3 id="crop-focal-point">Crop Focal Point <span class="new">New!</span></h3>
                     <p>In addition to the crop position, you can be more specific about the exact crop position using a focal point. Only works when <code>t=square</code>. This is defined using two offset percentages: <code>crop-x%-y%</code>.</p>
-                    <pre><code class="language-html">&lt;img src="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=crop-25-45"&gt;</code></pre>
-                    <a href="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=crop-25-45"><img src="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=crop-25-45" alt=""/></a>
+                    <pre><code class="language-html">&lt;img src="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=crop-0-20"&gt;</code></pre>
+                    <a href="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=crop-0-20"><img src="//$url/?url=$exampleImage&amp;w=300&amp;h=300&amp;t=square&amp;a=crop-0-20" alt=""/></a>
                     <h3 id="crop-crop">Manual crop <code>&amp;crop=</code></h3>
                     <p>Crops the image to specific dimensions after any other resize operations. Required format: <code>width,height,x,y</code>.</p>
                     <pre><code class="language-html">&lt;img src="//$url/?url=$exampleImage&amp;crop=300,300,680,500"&gt;</code></pre>

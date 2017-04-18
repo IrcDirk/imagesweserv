@@ -8,8 +8,8 @@ use Jcupitt\Vips\Image;
 
 /**
  * @property string $t
- * @property string $h
  * @property string $w
+ * @property string $h
  * @property string $a
  * @property string $bg
  * @property bool $hasAlpha

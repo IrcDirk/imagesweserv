@@ -8,13 +8,14 @@ use Jcupitt\Vips\Image;
 
 /**
  * @property string $t
- * @property string $h
  * @property string $w
+ * @property string $h
  * @property string $a
  * @property string $tmpFileName
  * @property string $page
  * @property string $or
  * @property string $trim
+ * @property array|bool $trimCoordinates
  */
 class Size extends BaseManipulator
 {
@@ -162,8 +163,16 @@ class Size extends BaseManipulator
             'linear' => false,
         ];
 
+        $trimCoordinates = $this->trimCoordinates;
+
         $inputWidth = $image->width;
         $inputHeight = $image->height;
+        $imageTrimWidth = $inputWidth;
+        $imageTrimHeight = $inputHeight;
+        if ($trimCoordinates) {
+            $imageTrimWidth = $trimCoordinates[2];
+            $imageTrimHeight = $trimCoordinates[3];
+        }
 
         $orientation = $this->or;
         $exifOrientation = Utils::resolveExifOrientation($image);
@@ -171,14 +180,19 @@ class Size extends BaseManipulator
         $autoRotate = $exifOrientation === 90 || $exifOrientation === 270;
 
         if ($userRotate || $autoRotate) {
-            // Swap input output width and height when rotating by 90 or 270 degrees
+            // Swap input/trim width and height when rotating by 90 or 270 degrees
             // Or when the image has exif orientation
             list($inputWidth, $inputHeight) = [$inputHeight, $inputWidth];
+            list($imageTrimWidth, $imageTrimHeight) = [$imageTrimHeight, $imageTrimWidth];
         }
 
         $cropPosition = $this->a;
 
         // Scaling calculations
+        $xFactor = 1.0;
+        $yFactor = 1.0;
+        $xFactorTrim = 1.0;
+        $yFactorTrim = 1.0;
         $targetResizeWidth = $width;
         $targetResizeHeight = $height;
 
@@ -190,14 +204,22 @@ class Size extends BaseManipulator
             // Fixed width and height
             $xFactor = (float)($inputWidth / $width);
             $yFactor = (float)($inputHeight / $height);
+            if ($trimCoordinates) {
+                $xFactorTrim = (float)($imageTrimWidth / $width);
+                $yFactorTrim = (float)($imageTrimHeight / $height);
+            }
             switch ($fit) {
                 case 'square':
                 case 'squaredown':
                 case 'crop':
                     if ($xFactor < $yFactor) {
                         $targetResizeHeight = (int)round((float)($inputHeight / $xFactor));
+                        $yFactor = $xFactor;
+                        $yFactorTrim = $xFactorTrim;
                     } else {
                         $targetResizeWidth = (int)round((float)($inputWidth / $yFactor));
+                        $xFactor = $yFactor;
+                        $xFactorTrim = $yFactorTrim;
                     }
                     break;
                 case 'letterbox':
@@ -205,34 +227,97 @@ class Size extends BaseManipulator
                 case 'fitup':
                     if ($xFactor > $yFactor) {
                         $targetResizeHeight = (int)round((float)($inputHeight / $xFactor));
+                        $yFactor = $xFactor;
+                        $yFactorTrim = $xFactorTrim;
                     } else {
                         $targetResizeWidth = (int)round((float)($inputWidth / $yFactor));
+                        $xFactor = $yFactor;
+                        $xFactorTrim = $yFactorTrim;
+                    }
+                    break;
+                case 'absolute':
+                    if ($userRotate) {
+                        list($xFactor, $yFactor) = [$yFactor, $xFactor];
+                        list($xFactorTrim, $yFactorTrim) = [$yFactorTrim, $xFactorTrim];
                     }
                     break;
             }
         } elseif ($width > 0) {
             // Fixed width
             $xFactor = (float)($inputWidth / $width);
+            if ($trimCoordinates) {
+                $xFactorTrim = (float)($imageTrimWidth / $width);
+            }
             if ($fit === 'absolute') {
-                $targetResizeHeight = $inputHeight;
+                $targetResizeHeight = $this->h = $inputHeight;
             } else {
                 // Auto height
                 $yFactor = $xFactor;
-                $targetResizeHeight = (int)round((float)($inputHeight / $yFactor));
+                $targetResizeHeight = $this->h = (int)round((float)($inputHeight / $yFactor));
+                $yFactorTrim = $xFactorTrim;
             }
         } elseif ($height > 0) {
             // Fixed height
             $yFactor = (float)($inputHeight / $height);
+            if ($trimCoordinates) {
+                $yFactorTrim = (float)($imageTrimHeight / $height);
+            }
             if ($fit === 'absolute') {
-                $targetResizeWidth = $inputWidth;
+                $targetResizeWidth = $this->w = $inputWidth;
             } else {
                 // Auto width
                 $xFactor = $yFactor;
-                $targetResizeWidth = (int)round((float)($inputWidth / $xFactor));
+                $targetResizeWidth = $this->w = (int)round((float)($inputWidth / $xFactor));
+                $xFactorTrim = $yFactorTrim;
             }
         } else {
-            // No resize required; return original image
+            // Identity transform
+            $this->w = $inputWidth;
+            $this->h = $inputHeight;
+
+            // No resize required; return the original image
             return $image;
+        }
+
+        if ($trimCoordinates) {
+            $targetResizeWidthTrim = (int)round((float)($inputWidth / $xFactorTrim));
+            $targetResizeHeightTrim = (int)round((float)($inputHeight / $yFactorTrim));
+
+            $xFactorTrim = (float)($targetResizeWidthTrim / $targetResizeWidth);
+            $yFactorTrim = (float)($targetResizeHeightTrim / $targetResizeHeight);
+
+            $xFactor /= $xFactorTrim;
+            $yFactor /= $yFactorTrim;
+
+            $imageTargetWidth = (int)round((float)($imageTrimWidth / $xFactor));
+            $imageTargetHeight = (int)round((float)($imageTrimHeight / $yFactor));
+
+            if ($userRotate || $autoRotate) {
+                // Swap target width and height when rotating by 90 or 270 degrees
+                // Or when the image has exif orientation
+                list($imageTargetWidth, $imageTargetHeight) = [$imageTargetHeight, $imageTargetWidth];
+            }
+
+            if ($fit !== 'absolute') {
+                if ($width > 0 && $height === 0) {
+                    $this->h = $imageTargetHeight;
+                } elseif ($height > 0 && $width === 0) {
+                    $this->w = $imageTargetWidth;
+                }
+            }
+
+            $leftTrim = (int)round((float)($trimCoordinates[0] / $xFactor));
+            $topTrim = (int)round((float)($trimCoordinates[1] / $yFactor));
+
+            $this->trimCoordinates = [
+                $leftTrim,
+                $topTrim,
+                $imageTargetWidth,
+                $imageTargetHeight,
+            ];
+
+            $targetResizeWidth *= $xFactorTrim;
+            $targetResizeHeight *= $yFactorTrim;
         }
 
         if ($userRotate) {
@@ -246,18 +331,8 @@ class Size extends BaseManipulator
         $thumbnailOptions['height'] = $targetResizeHeight;
         $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? 'down' : 'both';
 
-        if ($this->trim) {
-            // Trimming occurs before any resize operation, but we can't thumbnail
-            // on an existing image due to shrink-on-load. To achieve this:
-            // write the image to a buffer and do the thumbnail operator on that buffer.
-            // (Feels a little hackish but there is not an alternative at this moment..)
-            // TODO Thumbnail on an existing image?
-            return $image->thumbnail_buffer($image->writeToBuffer('.png'), $targetResizeWidth, $thumbnailOptions);
-        } else {
-            // TODO Pass $this->page to thumbnail a single page?
-            // TODO Ignore aspect ratio?
-            // Mocking on static methods is not possible, so we don't use `Image::`.
-            return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
-        }
+        // TODO Ignore aspect ratio?
+        // Mocking on static methods is not possible, so we don't use `Image::`.
+        return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
     }
 }

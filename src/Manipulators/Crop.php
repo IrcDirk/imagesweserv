@@ -6,10 +6,11 @@ use Jcupitt\Vips\Image;
 
 /**
  * @property string $t
- * @property string $h
  * @property string $w
+ * @property string $h
  * @property string $a
  * @property string $crop
+ * @property array|bool $trimCoordinates
  */
 class Crop extends BaseManipulator
 {
@@ -27,6 +28,7 @@ class Crop extends BaseManipulator
         $imageWidth = $image->width;
         $imageHeight = $image->height;
 
+        $trimCoordinates = $this->trimCoordinates;
         $coordinates = $this->resolveCropCoordinates($imageWidth, $imageHeight);
         $cropArr = ['square' => 0, 'squaredown' => 1, 'crop' => 2];
 
@@ -45,14 +47,32 @@ class Crop extends BaseManipulator
         ) {
             $minWidth = min($imageWidth, $width);
             $minHeight = min($imageHeight, $height);
+
             list($offsetPercentageX, $offsetPercentageY) = $this->getCrop();
-            $offsetX = (int)(($imageWidth * $offsetPercentageX / 100) - ($width / 2));
-            $offsetY = (int)(($imageHeight * $offsetPercentageY / 100) - ($height / 2));
+            $offsetX = (int)(($imageWidth - $width) * ($offsetPercentageX / 100));
+            $offsetY = (int)(($imageHeight - $height) * ($offsetPercentageY / 100));
+
+            if ($trimCoordinates) {
+                $leftTrim = $trimCoordinates[0];
+                $topTrim = $trimCoordinates[1];
+                $imageTargetWidth = $trimCoordinates[2];
+                $imageTargetHeight = $trimCoordinates[3];
+
+                $offsetX = (int)(($imageTargetWidth - $width) * ($offsetPercentageX / 100)) + $leftTrim;
+                $offsetY = (int)(($imageTargetHeight - $height) * ($offsetPercentageY / 100)) + $topTrim;
+            }
 
             list($left, $top) = $this->calculateCrop($imageWidth, $imageHeight, $width, $height,
                 $offsetX, $offsetY);
 
             $image = $image->crop($left, $top, $minWidth, $minHeight);
+        } elseif ($trimCoordinates) {
+            $image = $image->crop(
+                $trimCoordinates[0],
+                $trimCoordinates[1],
+                $trimCoordinates[2],
+                $trimCoordinates[3]
+            );
         }
 
         return $image;

@@ -126,19 +126,28 @@ class ServerTest extends TestCase
             $mock->shouldReceive('writeToBuffer')->andReturn($pixel);
         });
 
+        $params = [
+            'accessMethod' => Access::SEQUENTIAL,
+            'tmpFileName' => $tempFile,
+            'loader' => 'VipsForeignLoadPng',
+            'hasAlpha' => true,
+            'is16Bit' => false,
+            'isPremultiplied' => false,
+            'w' => 0,
+            'h' => 0,
+            'trimCoordinates' => false
+        ];
+
         $manipulator = Mockery::mock(
             'AndriesLouw\imagesweserv\Manipulators\ManipulatorInterface',
-            function ($mock) use ($image, $tempFile) {
-                $mock->shouldReceive('setParams')->with([
-                    'accessMethod' => Access::SEQUENTIAL,
-                    'tmpFileName' => $tempFile,
-                    'loader' => 'VipsForeignLoadPng',
-                    'hasAlpha' => true,
-                    'is16Bit' => false,
-                    'isPremultiplied' => false,
-                    'w' => 0,
-                    'h' => 0,
-                ]);
+            function ($mock) use ($image, $params) {
+                $mock->shouldReceive('setParams')
+                    ->with($params)
+                    ->andReturnSelf();
+
+                $mock->shouldReceive('getParams')
+                    ->andReturn($params);
+
                 $mock->shouldReceive('run')->andReturn($image);
             }
         );
@@ -190,20 +199,29 @@ class ServerTest extends TestCase
             $mock->shouldReceive('writeToBuffer')->andReturn($pixel);
         });
 
+        $params = [
+            'accessMethod' => Access::SEQUENTIAL,
+            'tmpFileName' => $tempFile,
+            'loader' => 'VipsForeignLoadPng',
+            'hasAlpha' => true,
+            'is16Bit' => false,
+            'isPremultiplied' => false,
+            'encoding' => 'base64',
+            'w' => 0,
+            'h' => 0,
+            'trimCoordinates' => false
+        ];
+
         $manipulator = Mockery::mock(
             'AndriesLouw\imagesweserv\Manipulators\ManipulatorInterface',
-            function ($mock) use ($image, $tempFile) {
-                $mock->shouldReceive('setParams')->with([
-                    'accessMethod' => Access::SEQUENTIAL,
-                    'tmpFileName' => $tempFile,
-                    'loader' => 'VipsForeignLoadPng',
-                    'hasAlpha' => true,
-                    'is16Bit' => false,
-                    'isPremultiplied' => false,
-                    'encoding' => 'base64',
-                    'w' => 0,
-                    'h' => 0,
-                ]);
+            function ($mock) use ($image, $params) {
+                $mock->shouldReceive('setParams')
+                    ->with($params)
+                    ->andReturnSelf();
+
+                $mock->shouldReceive('getParams')
+                    ->andReturn($params);
+
                 $mock->shouldReceive('run')->andReturn($image);
             }
         );

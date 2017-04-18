@@ -6,15 +6,8 @@ use AndriesLouw\imagesweserv\Client;
 use AndriesLouw\imagesweserv\Exception\ImageNotReadableException;
 use AndriesLouw\imagesweserv\Exception\ImageTooLargeException;
 use AndriesLouw\imagesweserv\Exception\RateExceededException;
-use AndriesLouw\imagesweserv\Manipulators\Background;
-use AndriesLouw\imagesweserv\Manipulators\Blur;
-use AndriesLouw\imagesweserv\Manipulators\Gamma;
 use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
-use AndriesLouw\imagesweserv\Manipulators\Letterbox;
 use AndriesLouw\imagesweserv\Manipulators\ManipulatorInterface;
-use AndriesLouw\imagesweserv\Manipulators\Shape;
-use AndriesLouw\imagesweserv\Manipulators\Sharpen;
-use AndriesLouw\imagesweserv\Manipulators\Trim;
 use AndriesLouw\imagesweserv\Throttler\ThrottlerInterface;
 use GuzzleHttp\Exception\RequestException;
 use InvalidArgumentException;
@@ -213,6 +206,10 @@ class Api implements ApiInterface
                 $params['loader'] === 'VipsForeignLoadMagickFile')
         ) {
             $loadOptions['page'] = (int)$params['page'];
+
+            // Add page to the temporary file parameter
+            // Useful for the thumbnail operator
+            $params['tmpFileName'] .= '[page=' . $loadOptions['page'] . ']';
         }
 
         try {
@@ -248,26 +245,16 @@ class Api implements ApiInterface
             $params['h'] = (int)$params['h'];
         }
 
+        $params['trimCoordinates'] = false;
+
         // Do our image manipulations
         foreach ($this->manipulators as $manipulator) {
             $manipulator->setParams($params);
 
             $image = $manipulator->run($image);
 
-            // Letterbox and shape manipulators can override `hasAlpha` parameter.
-            if ($manipulator instanceof Letterbox || $manipulator instanceof Shape) {
-                $params['hasAlpha'] = $manipulator->hasAlpha;
-            }
-
-            // Trim, gamma, sharpen, blur and background manipulators can override `isPremultiplied` parameter.
-            if ($manipulator instanceof Trim ||
-                $manipulator instanceof Gamma ||
-                $manipulator instanceof Sharpen ||
-                $manipulator instanceof Blur ||
-                $manipulator instanceof Background
-            ) {
-                $params['isPremultiplied'] = $manipulator->isPremultiplied;
-            }
+            // A manipulator can override the given parameters
+            $params = $manipulator->getParams();
         }
 
         // Reverse premultiplication after all transformations:
