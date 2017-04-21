@@ -7,6 +7,8 @@ use AndriesLouw\imagesweserv\Exception\ImageTooBigException;
 use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
+use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -161,7 +163,13 @@ class Client
         /**
          * @var ResponseInterface $response
          */
-        $this->client->request('GET', $url, $requestOptions);
+        try {
+            $this->client->request('GET', $url, $requestOptions);
+        } catch (InvalidArgumentException $e) {
+            $req = new Request('GET', $url);
+            throw new RequestException('Unable to parse redirect URI', $req, null, $e);
+        }
+
 
         return $this->fileName;
     }

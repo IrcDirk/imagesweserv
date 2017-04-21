@@ -24,7 +24,8 @@ class Trim extends BaseManipulator
      */
     public function run(Image $image): Image
     {
-        if (!isset($this->trim)) {
+        // Make sure that trimming is required
+        if (!isset($this->trim) || $image->width < 3 || $image->height < 3) {
             return $image;
         }
 
@@ -33,11 +34,8 @@ class Trim extends BaseManipulator
             // dark fringing around bright pixels
             // See: http://entropymine.com/imageworsener/resizealpha/
             $image = $image->premultiply();
-            // Only set the `isPremultiplied` boolean to true
-            // if we're sure that a resize is not required.
-            if ($this->w === 0 && $this->h === 0) {
-                $this->isPremultiplied = true;
-            }
+            // No need to set the `isPremultiplied` boolean to true because
+            // the image will be reloaded at the thumbnail operator.
         }
 
         $trim = $this->getTrim();

@@ -196,8 +196,8 @@ class Size extends BaseManipulator
         $targetResizeWidth = $width;
         $targetResizeHeight = $height;
 
-        // Is smart crop?
-        if ($cropPosition === 'entropy' || $cropPosition === 'attention') {
+        // Is smart crop? Only when a fixed width and height is specified.
+        if ($width > 0 && $height > 0 && ($cropPosition === 'entropy' || $cropPosition === 'attention')) {
             // Set crop option
             $thumbnailOptions['crop'] = $cropPosition;
         } elseif ($width > 0 && $height > 0) {
@@ -272,11 +272,8 @@ class Size extends BaseManipulator
             }
         } else {
             // Identity transform
-            $this->w = $inputWidth;
-            $this->h = $inputHeight;
-
-            // No resize required; return the original image
-            return $image;
+            $targetResizeWidth = $this->w = $inputWidth;
+            $targetResizeHeight = $this->h = $inputHeight;
         }
 
         if ($trimCoordinates) {

@@ -231,12 +231,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jcupitt/php-vips.git",
-                "reference": "81d6b54813cda559a83329a6c869e8983c36f7c7"
+                "reference": "6ab47d978c814c1a297e33681248bba2e6d9a05f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jcupitt/php-vips/zipball/81d6b54813cda559a83329a6c869e8983c36f7c7",
-                "reference": "81d6b54813cda559a83329a6c869e8983c36f7c7",
+                "url": "https://api.github.com/repos/jcupitt/php-vips/zipball/6ab47d978c814c1a297e33681248bba2e6d9a05f",
+                "reference": "6ab47d978c814c1a297e33681248bba2e6d9a05f",
                 "shasum": ""
             },
             "require": {
@@ -279,7 +279,7 @@
                 "libvips",
                 "processing"
             ],
-            "time": "2017-04-06T17:38:14+00:00"
+            "time": "2017-04-17T15:01:39+00:00"
         },
         {
             "name": "jeremykendall/php-domain-parser",
@@ -403,16 +403,16 @@
         },
         {
             "name": "league/uri-components",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri-components.git",
-                "reference": "84a5c0a58f028f3a81f6b8c655f8f5db7e4e66f6"
+                "reference": "72aaa456182e60f0c3ff207a546b5fe1f90a96e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri-components/zipball/84a5c0a58f028f3a81f6b8c655f8f5db7e4e66f6",
-                "reference": "84a5c0a58f028f3a81f6b8c655f8f5db7e4e66f6",
+                "url": "https://api.github.com/repos/thephpleague/uri-components/zipball/72aaa456182e60f0c3ff207a546b5fe1f90a96e0",
+                "reference": "72aaa456182e60f0c3ff207a546b5fe1f90a96e0",
                 "shasum": ""
             },
             "require": {
@@ -464,7 +464,7 @@
                 "url",
                 "userinfo"
             ],
-            "time": "2017-02-06T08:35:30+00:00"
+            "time": "2017-04-19T07:19:52+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -591,16 +591,16 @@
         },
         {
             "name": "league/uri-parser",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri-parser.git",
-                "reference": "86d0d40761bd43dc31b8e47ee5035abbe9a90e33"
+                "reference": "2b756258c42f489eec5b89bf4030065070ee685b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri-parser/zipball/86d0d40761bd43dc31b8e47ee5035abbe9a90e33",
-                "reference": "86d0d40761bd43dc31b8e47ee5035abbe9a90e33",
+                "url": "https://api.github.com/repos/thephpleague/uri-parser/zipball/2b756258c42f489eec5b89bf4030065070ee685b",
+                "reference": "2b756258c42f489eec5b89bf4030065070ee685b",
                 "shasum": ""
             },
             "require": {
@@ -646,20 +646,20 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-03-01T10:38:20+00:00"
+            "time": "2017-04-19T07:41:41+00:00"
         },
         {
             "name": "league/uri-schemes",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri-schemes.git",
-                "reference": "1be3f88cdc2b6e38d1492ce817f7314d998292d1"
+                "reference": "8aff19a2ea687e94869616349af43deb910ebfd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri-schemes/zipball/1be3f88cdc2b6e38d1492ce817f7314d998292d1",
-                "reference": "1be3f88cdc2b6e38d1492ce817f7314d998292d1",
+                "url": "https://api.github.com/repos/thephpleague/uri-schemes/zipball/8aff19a2ea687e94869616349af43deb910ebfd3",
+                "reference": "8aff19a2ea687e94869616349af43deb910ebfd3",
                 "shasum": ""
             },
             "require": {
@@ -713,7 +713,7 @@
                 "ws",
                 "wss"
             ],
-            "time": "2017-03-06T08:51:22+00:00"
+            "time": "2017-04-19T08:51:53+00:00"
         },
         {
             "name": "psr/http-message",
@@ -968,13 +968,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/padraic/mockery.git",
-                "reference": "fdfb1aa6085bde5f2d935e2ed8ff37266cce5ed2"
+                "url": "https://github.com/mockery/mockery.git",
+                "reference": "e3a85ae983b481d9cc680ca8e1a03879772353f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/fdfb1aa6085bde5f2d935e2ed8ff37266cce5ed2",
-                "reference": "fdfb1aa6085bde5f2d935e2ed8ff37266cce5ed2",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/e3a85ae983b481d9cc680ca8e1a03879772353f8",
+                "reference": "e3a85ae983b481d9cc680ca8e1a03879772353f8",
                 "shasum": ""
             },
             "require": {
@@ -1013,7 +1013,7 @@
                 }
             ],
             "description": "Mockery is a simple yet flexible PHP mock object framework for use in unit testing with PHPUnit, PHPSpec or any other testing framework. Its core goal is to offer a test double framework with a succinct API capable of clearly defining all possible object operations and interactions using a human readable Domain Specific Language (DSL). Designed as a drop in alternative to PHPUnit's phpunit-mock-objects library, Mockery is easy to integrate with PHPUnit and can operate alongside phpunit-mock-objects without the World ending.",
-            "homepage": "http://github.com/padraic/mockery",
+            "homepage": "http://github.com/mockery/mockery",
             "keywords": [
                 "BDD",
                 "TDD",
@@ -1026,20 +1026,20 @@
                 "test double",
                 "testing"
             ],
-            "time": "2017-04-07T09:06:48+00:00"
+            "time": "2017-04-15T07:20:44+00:00"
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "5a5a9fc8025a08d8919be87d6884d5a92520cefe"
+                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/5a5a9fc8025a08d8919be87d6884d5a92520cefe",
-                "reference": "5a5a9fc8025a08d8919be87d6884d5a92520cefe",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8e6e04167378abf1ddb4d3522d8755c5fd90d102",
+                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102",
                 "shasum": ""
             },
             "require": {
@@ -1068,7 +1068,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-01-26T22:05:40+00:00"
+            "time": "2017-04-12T18:52:22+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -1383,16 +1383,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "5.1.0",
+            "version": "5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "cff36444733ac6d3f153866f55898373ca184610"
+                "reference": "bc433b7af27e0ab9b6b4c6d8ec918a493875f6bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/cff36444733ac6d3f153866f55898373ca184610",
-                "reference": "cff36444733ac6d3f153866f55898373ca184610",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/bc433b7af27e0ab9b6b4c6d8ec918a493875f6bc",
+                "reference": "bc433b7af27e0ab9b6b4c6d8ec918a493875f6bc",
                 "shasum": ""
             },
             "require": {
@@ -1442,7 +1442,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-04-07T04:39:58+00:00"
+            "time": "2017-04-12T07:59:32+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",

@@ -28,6 +28,7 @@ class OrientationTest extends TestCase
     public function testRun()
     {
         $image = Mockery::mock('Jcupitt\Vips\Image', function ($mock) {
+            $mock->shouldReceive('copyMemory')->andReturnSelf()->once();
             $mock->shouldReceive('rot')->with(Angle::D90)->andReturnSelf()->once();
         });
 
