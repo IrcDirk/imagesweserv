@@ -403,7 +403,7 @@ class Api implements ApiInterface
             //'gif' => 'image/gif',
             'jpg' => 'image/jpeg',
             'png' => 'image/png',
-            'webp' => 'image/webp',
+            'webp' => 'image/webp'
         ];
     }
 

@@ -14,6 +14,14 @@ class Utils
     const VIPS_META_ORIENTATION = 'orientation';
 
     /**
+     * The name we use to attach an ICC profile. The file read and write
+     * operations for TIFF, JPEG, PNG and others use this item of metadata to
+     * attach and save ICC profiles. The profile is updated by the
+     * vips_icc_transform() operations.
+     */
+    const VIPS_META_ICC_NAME = 'icc-profile-data';
+
+    /**
      * Are pixel values in this image 16-bit integer?
      *
      * @param  string $interpretation The VipsInterpretation
@@ -24,6 +32,18 @@ class Utils
     {
         return $interpretation === Interpretation::RGB16
             || $interpretation === Interpretation::GREY16;
+    }
+
+    /**
+     * Does this image have an embedded profile?
+     *
+     * @param  Image $image The source image.
+     *
+     * @return bool indicating if this image have an embedded profile
+     */
+    public static function hasProfile(Image $image): bool
+    {
+        return $image->typeof(self::VIPS_META_ICC_NAME) !== 0;
     }
 
     /**

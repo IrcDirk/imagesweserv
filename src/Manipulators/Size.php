@@ -5,6 +5,7 @@ namespace AndriesLouw\imagesweserv\Manipulators;
 use AndriesLouw\imagesweserv\Exception\ImageTooLargeException;
 use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
 use Jcupitt\Vips\Image;
+use Jcupitt\Vips\Interpretation;
 
 /**
  * @property string $t
@@ -160,8 +161,17 @@ class Size extends BaseManipulator
         // Default settings
         $thumbnailOptions = [
             'auto_rotate' => true,
-            'linear' => false,
+            'linear' => false
         ];
+
+        // Ensure we're using a device-independent colour space
+        if (Utils::hasProfile($image)) {
+            // Convert to sRGB using embedded profile from https://packages.debian.org/sid/all/icc-profiles-free/filelist
+            $thumbnailOptions['export_profile'] = __DIR__ . '/../ICC/sRGB.icc';
+        } elseif ($image->interpretation === Interpretation::CMYK) {
+            // Import using default CMYK profile from http://www.argyllcms.com/cmyk.icm
+            $thumbnailOptions['import_profile'] = __DIR__ . '/../ICC/cmyk.icm';
+        }
 
         $trimCoordinates = $this->trimCoordinates;
 
@@ -177,11 +187,10 @@ class Size extends BaseManipulator
         $orientation = $this->or;
         $exifOrientation = Utils::resolveExifOrientation($image);
         $userRotate = $orientation === '90' || $orientation === '270';
-        $autoRotate = $exifOrientation === 90 || $exifOrientation === 270;
+        $exifRotate = $exifOrientation === 90 || $exifOrientation === 270;
 
-        if ($userRotate || $autoRotate) {
+        if ($userRotate xor $exifRotate) {
             // Swap input/trim width and height when rotating by 90 or 270 degrees
-            // Or when the image has exif orientation
             list($inputWidth, $inputHeight) = [$inputHeight, $inputWidth];
             list($imageTrimWidth, $imageTrimHeight) = [$imageTrimHeight, $imageTrimWidth];
         }
@@ -236,7 +245,7 @@ class Size extends BaseManipulator
                     }
                     break;
                 case 'absolute':
-                    if ($userRotate) {
+                    if ($userRotate xor $exifRotate) {
                         list($xFactor, $yFactor) = [$yFactor, $xFactor];
                         list($xFactorTrim, $yFactorTrim) = [$yFactorTrim, $xFactorTrim];
                     }
@@ -289,9 +298,8 @@ class Size extends BaseManipulator
             $imageTargetWidth = (int)round((float)($imageTrimWidth / $xFactor));
             $imageTargetHeight = (int)round((float)($imageTrimHeight / $yFactor));
 
-            if ($userRotate || $autoRotate) {
+            if ($userRotate xor $exifRotate) {
                 // Swap target width and height when rotating by 90 or 270 degrees
-                // Or when the image has exif orientation
                 list($imageTargetWidth, $imageTargetHeight) = [$imageTargetHeight, $imageTargetWidth];
             }
 
@@ -319,8 +327,8 @@ class Size extends BaseManipulator
 
         if ($userRotate) {
             // Swap target output width and height when rotating by 90 or 270 degrees
-            // Note: don't check here for EXIF orientation because that's handled
-            // in the thumbnail operator.
+            // Note: EXIF orientation is handled in the thumbnail operator
+            // so it's not necessary to swap it here.
             list($targetResizeWidth, $targetResizeHeight) = [$targetResizeHeight, $targetResizeWidth];
         }
 
@@ -329,7 +337,7 @@ class Size extends BaseManipulator
         $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? 'down' : 'both';
 
         // TODO Ignore aspect ratio?
-        // Mocking on static methods is not possible, so we don't use `Image::`.
+        // Mocking on static methods isn't possible, so we don't use `Image::`.
         return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
     }
 }

@@ -4,6 +4,7 @@ namespace AndriesLouw\imagesweserv\Manipulators;
 
 use AndriesLouw\imagesweserv\Exception\ImageTooLargeException;
 use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
+use Jcupitt\Vips\Interpretation;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -50,8 +51,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -95,8 +106,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -140,8 +161,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -186,8 +217,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -232,8 +273,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -278,8 +329,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -325,8 +386,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 
@@ -372,8 +443,18 @@ class SizeTest extends TestCase
                 ->andReturn(2421)
                 ->times(3);
 
+            $mock->shouldReceive('__get')
+                ->with('interpretation')
+                ->andReturn(Interpretation::SRGB)
+                ->once();
+
             $mock->shouldReceive('typeof')
                 ->with(Utils::VIPS_META_ORIENTATION)
+                ->andReturn(0)
+                ->once();
+
+            $mock->shouldReceive('typeof')
+                ->with(Utils::VIPS_META_ICC_NAME)
                 ->andReturn(0)
                 ->once();
 

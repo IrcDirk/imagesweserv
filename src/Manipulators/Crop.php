@@ -113,7 +113,7 @@ class Crop extends BaseManipulator
             (int)$coordinates[0],
             (int)$coordinates[1],
             (int)$coordinates[2],
-            (int)$coordinates[3],
+            (int)$coordinates[3]
         ];
     }
 
@@ -137,7 +137,7 @@ class Crop extends BaseManipulator
             'bottom-left' => [0, 100],
             'b' => [50, 100], // Deprecated use bottom instead
             'bottom' => [50, 100],
-            'bottom-right' => [100, 100],
+            'bottom-right' => [100, 100]
         ];
 
         if (isset($cropMethods[$this->a])) {

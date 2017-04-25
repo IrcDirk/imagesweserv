@@ -156,7 +156,7 @@ class Client
             'timeout' => $this->options['timeout'],
             'headers' => [
                 'Accept-Encoding' => 'gzip',
-                'User-Agent' => $this->options['user_agent'],
+                'User-Agent' => $this->options['user_agent']
             ]
         ];
 
