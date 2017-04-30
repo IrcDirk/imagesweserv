@@ -81,14 +81,8 @@ class Background extends BaseManipulator
             // If the image has more than two bands and the requested background color has an alpha channel;
             // alpha compositing.
 
-            // Make a 1x1 pixel with the red channel and cast it to the origin image numerical format.
-            $pixel = Image::black(1, 1)->add($multiplier * $backgroundRGBA[0])->cast($image->format);
-
-            // Extend this 1x1 pixel to match the origin image dimensions.
-            $backgroundImage = $pixel->embed(0, 0, $image->width, $image->height, ['extend' => Extend::COPY]);
-
-            // Ensure that the interpretation of the background is the same as the origin image.
-            $backgroundImage->interpretation = $image->interpretation;
+            // Create a new image from a constant that matches the origin image dimensions
+            $backgroundImage = $image->newFromImage($multiplier * $backgroundRGBA[0]);
 
             // Bandwise join the rest of the channels including the alpha channel.
             $backgroundImage = $backgroundImage->bandjoin(

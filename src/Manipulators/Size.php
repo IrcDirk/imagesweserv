@@ -314,7 +314,7 @@ class Size extends BaseManipulator
             $leftTrim = (int)round((float)($trimCoordinates[0] / $xFactor));
             $topTrim = (int)round((float)($trimCoordinates[1] / $yFactor));
 
-            $this->trimCoordinates = [
+            $trimCoordinates = [
                 $leftTrim,
                 $topTrim,
                 $imageTargetWidth,
@@ -338,6 +338,26 @@ class Size extends BaseManipulator
 
         // TODO Ignore aspect ratio?
         // Mocking on static methods isn't possible, so we don't use `Image::`.
-        return $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
+        $thumbnailImage = $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
+
+        if ($trimCoordinates) {
+            $shrunkWidth = $thumbnailImage->width;
+            $shrunkHeight = $thumbnailImage->height;
+            $xFactor = (float)($shrunkWidth) / (float)($targetResizeWidth);
+            $yFactor = (float)($shrunkHeight) / (float)($targetResizeHeight);
+            $xShrink = max(1, (int)floor($xFactor));
+            $yShrink = max(1, (int)floor($yFactor));
+            $xResidual = (float)($xShrink) / $xFactor;
+            $yResidual = (float)($yShrink) / $yFactor;
+
+            $this->trimCoordinates = [
+                (int)round((float)($trimCoordinates[0] / $xResidual)),
+                (int)round((float)($trimCoordinates[1] / $yResidual)),
+                (int)round((float)($trimCoordinates[2] / $xResidual)),
+                (int)round((float)($trimCoordinates[3] / $yResidual)),
+            ];
+        }
+
+        return $thumbnailImage;
     }
 }
