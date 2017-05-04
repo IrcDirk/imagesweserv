@@ -290,13 +290,12 @@ class ThumbnailTest extends TestCase
                 ->andReturn(0)
                 ->once();
 
-            // TODO Ignore aspect ratio
             $mock->shouldReceive('thumbnail')
                 ->with('lichtenstein.jpg', 300, [
                     'height' => 300,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => Size::BOTH
+                    'size' => 'force'
                 ])
                 ->andReturnSelf()
                 ->once();

@@ -343,7 +343,6 @@ class Thumbnail extends BaseManipulator
             $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? Size::DOWN : Size::BOTH;
         }
 
-        // TODO Ignore aspect ratio?
         // Mocking on static methods isn't possible, so we don't use `Image::`.
         $thumbnailImage = $image->thumbnail($this->tmpFileName, $targetResizeWidth, $thumbnailOptions);
 
