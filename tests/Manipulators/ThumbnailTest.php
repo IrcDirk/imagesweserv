@@ -4,17 +4,19 @@ namespace AndriesLouw\imagesweserv\Manipulators;
 
 use AndriesLouw\imagesweserv\Exception\ImageTooLargeException;
 use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
+use Jcupitt\Vips\Interesting;
 use Jcupitt\Vips\Interpretation;
+use Jcupitt\Vips\Size;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class SizeTest extends TestCase
+class ThumbnailTest extends TestCase
 {
     private $manipulator;
 
     public function setUp()
     {
-        $this->manipulator = new Size();
+        $this->manipulator = new Thumbnail();
     }
 
     public function tearDown()
@@ -24,7 +26,7 @@ class SizeTest extends TestCase
 
     public function testCreateInstance()
     {
-        $this->assertInstanceOf('AndriesLouw\imagesweserv\Manipulators\Size', $this->manipulator);
+        $this->assertInstanceOf('AndriesLouw\imagesweserv\Manipulators\Thumbnail', $this->manipulator);
     }
 
     public function testSetMaxImageSize()
@@ -71,7 +73,7 @@ class SizeTest extends TestCase
                     'height' => 300,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'down'
+                    'size' => Size::DOWN
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -126,7 +128,7 @@ class SizeTest extends TestCase
                     'height' => 3000,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'both'
+                    'size' => Size::BOTH
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -181,7 +183,7 @@ class SizeTest extends TestCase
                     'height' => 369,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'both'
+                    'size' => Size::BOTH
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -237,7 +239,7 @@ class SizeTest extends TestCase
                     'height' => 3692,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'down'
+                    'size' => Size::DOWN
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -294,7 +296,7 @@ class SizeTest extends TestCase
                     'height' => 300,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'both'
+                    'size' => Size::BOTH
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -349,7 +351,7 @@ class SizeTest extends TestCase
                     'height' => 300,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'both'
+                    'size' => Size::BOTH
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -406,8 +408,8 @@ class SizeTest extends TestCase
                     'height' => 300,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'both',
-                    'crop' => 'entropy',
+                    'size' => Size::BOTH,
+                    'crop' => Interesting::ENTROPY,
                 ])
                 ->andReturnSelf()
                 ->once();
@@ -463,8 +465,8 @@ class SizeTest extends TestCase
                     'height' => 300,
                     'auto_rotate' => true,
                     'linear' => false,
-                    'size' => 'both',
-                    'crop' => 'attention',
+                    'size' => Size::BOTH,
+                    'crop' => Interesting::ATTENTION,
                 ])
                 ->andReturnSelf()
                 ->once();

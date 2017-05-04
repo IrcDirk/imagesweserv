@@ -5,7 +5,9 @@ namespace AndriesLouw\imagesweserv\Manipulators;
 use AndriesLouw\imagesweserv\Exception\ImageTooLargeException;
 use AndriesLouw\imagesweserv\Manipulators\Helpers\Utils;
 use Jcupitt\Vips\Image;
+use Jcupitt\Vips\Interesting;
 use Jcupitt\Vips\Interpretation;
+use Jcupitt\Vips\Size;
 
 /**
  * @property string $t
@@ -18,7 +20,7 @@ use Jcupitt\Vips\Interpretation;
  * @property string $trim
  * @property array|bool $trimCoordinates
  */
-class Size extends BaseManipulator
+class Thumbnail extends BaseManipulator
 {
     /**
      * Maximum image size in pixels.
@@ -28,7 +30,7 @@ class Size extends BaseManipulator
     protected $maxImageSize;
 
     /**
-     * Create Size instance.
+     * Create Thumbnail instance.
      *
      * @param int|null $maxImageSize Maximum image size in pixels.
      */
@@ -58,7 +60,7 @@ class Size extends BaseManipulator
     }
 
     /**
-     * Perform size image manipulation.
+     * Perform thumbnail image manipulation.
      *
      * @param  Image $image The source image.
      *
@@ -73,7 +75,7 @@ class Size extends BaseManipulator
         // Check if image size is greater then the maximum allowed image size after dimension is resolved
         $this->checkImageSize($image, $width, $height);
 
-        $image = $this->doResize($image, $fit, $width, $height);
+        $image = $this->doThumbnail($image, $fit, $width, $height);
 
         return $image;
     }
@@ -147,7 +149,7 @@ class Size extends BaseManipulator
     }
 
     /**
-     * Perform resize image manipulation.
+     * Perform thumbnail image manipulation.
      *
      * @param  Image $image The source image.
      * @param  string $fit The fit.
@@ -156,7 +158,7 @@ class Size extends BaseManipulator
      *
      * @return Image The manipulated image.
      */
-    public function doResize(Image $image, string $fit, int $width, int $height): Image
+    public function doThumbnail(Image $image, string $fit, int $width, int $height): Image
     {
         // Default settings
         $thumbnailOptions = [
@@ -206,7 +208,7 @@ class Size extends BaseManipulator
         $targetResizeHeight = $height;
 
         // Is smart crop? Only when a fixed width and height is specified.
-        if ($width > 0 && $height > 0 && ($cropPosition === 'entropy' || $cropPosition === 'attention')) {
+        if ($width > 0 && $height > 0 && ($cropPosition === Interesting::ENTROPY || $cropPosition === Interesting::ATTENTION)) {
             // Set crop option
             $thumbnailOptions['crop'] = $cropPosition;
         } elseif ($width > 0 && $height > 0) {
@@ -334,7 +336,7 @@ class Size extends BaseManipulator
 
         // Assign settings
         $thumbnailOptions['height'] = $targetResizeHeight;
-        $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? 'down' : 'both';
+        $thumbnailOptions['size'] = $this->withoutEnlargement($fit) ? Size::DOWN : Size::BOTH;
 
         // TODO Ignore aspect ratio?
         // Mocking on static methods isn't possible, so we don't use `Image::`.
