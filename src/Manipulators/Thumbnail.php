@@ -246,12 +246,6 @@ class Thumbnail extends BaseManipulator
                         $xFactorTrim = $yFactorTrim;
                     }
                     break;
-                case 'absolute':
-                    if ($userRotate xor $exifRotate) {
-                        list($xFactor, $yFactor) = [$yFactor, $xFactor];
-                        list($xFactorTrim, $yFactorTrim) = [$yFactorTrim, $xFactorTrim];
-                    }
-                    break;
             }
         } elseif ($width > 0) {
             // Fixed width
@@ -297,8 +291,26 @@ class Thumbnail extends BaseManipulator
             $xFactor /= $xFactorTrim;
             $yFactor /= $yFactorTrim;
 
-            $imageTargetWidth = (int)round((float)($imageTrimWidth / $xFactor));
-            $imageTargetHeight = (int)round((float)($imageTrimHeight / $yFactor));
+            if ($fit === 'absolute' && ($width > 0 || $height > 0)) {
+                if ($width > 0 && $height > 0) {
+                    $imageTargetWidth = $targetResizeWidth;
+                    $imageTargetHeight = $targetResizeHeight;
+                } elseif ($width > 0) {
+                    $imageTargetWidth = $targetResizeWidth;
+                    $imageTargetHeight = (int)round((float)($imageTrimHeight / $yFactor));
+
+                } else {
+                    $imageTargetHeight = $targetResizeHeight;
+                    $imageTargetWidth = (int)round((float)($imageTrimWidth / $xFactor));
+                }
+
+                if ($userRotate xor $exifRotate) {
+                    list($xFactor, $yFactor) = [$yFactor, $xFactor];
+                }
+            } else {
+                $imageTargetWidth = (int)round((float)($imageTrimWidth / $xFactor));
+                $imageTargetHeight = (int)round((float)($imageTrimHeight / $yFactor));
+            }
 
             if ($userRotate xor $exifRotate) {
                 // Swap target width and height when rotating by 90 or 270 degrees
